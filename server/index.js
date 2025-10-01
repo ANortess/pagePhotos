@@ -4,6 +4,7 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'; // Importa dotenv
+import mysql2 from 'mysql2/promise';
 
 // Carga las variables de entorno del archivo .env
 dotenv.config();
@@ -16,13 +17,42 @@ app.use(cors());
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
 
-// --- Simulación de Base de Datos de Usuarios ---
-// En un entorno real, esto sería una base de datos como MongoDB, PostgreSQL, etc.
-const users = []; // Array para almacenar usuarios registrados temporalmente
+// --- Configuración de la Conexión a MySQL ---
+const dbConfig = {
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || 'password', // Cambia 'password' si usas root sin password localmente
+    database: process.env.MYSQL_DATABASE || 'auth_db',
+    port: process.env.MYSQL_PORT || 3306,
+};
 
-// --- Rutas de Autenticación ---
+let pool; // Usaremos un pool de conexiones para mejor rendimiento
 
-// Ruta de Registro
+async function connectToDb() {
+    try {
+        pool = mysql2.createPool(dbConfig);
+        // Intenta una conexión para verificar que funciona
+        await pool.getConnection();
+        console.log('Conectado a MySQL');
+
+        // --- Crear tabla de usuarios si no existe ---
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS users (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        console.log('Tabla de usuarios verificada/creada');
+
+    } catch (err) {
+        console.error('Error al conectar o inicializar MySQL:', err);
+    }
+}
+
+connectToDb();
+
 app.post('/api/register', async (req, res) => {
     const { email, password } = req.body;
 
@@ -30,25 +60,27 @@ app.post('/api/register', async (req, res) => {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
-    // Verificar si el usuario ya existe
-    const existingUser = users.find(user => user.email === email);
-    if (existingUser) {
-        return res.status(409).json({ message: 'El usuario con este email ya existe.' });
-    }
-
     try {
-        // Hashear la contraseña antes de guardarla
-        const hashedPassword = await bcrypt.hash(password, 10); // 10 es el "salt rounds"
+        // Verificar si el usuario ya existe en la base de datos
+        const [rows] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
+        if (rows.length > 0) {
+            return res.status(409).json({ message: 'El usuario con este email ya existe.' });
+        }
 
-        const newUser = { id: users.length + 1, email, password: hashedPassword };
-        users.push(newUser); // Guardar el nuevo usuario en nuestro array simulado
+        // Hashear la contraseña antes de guardarla
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Insertar el nuevo usuario en la base de datos
+        const [result] = await pool.execute(
+            'INSERT INTO users (email, password) VALUES (?, ?)',
+            [email, hashedPassword]
+        );
+        const newUserId = result.insertId; // Obtener el ID del usuario recién insertado
 
         // Generar un token JWT para el nuevo usuario
-        // Aquí usamos el JWT_SECRET que cargamos de .env
-        const token = jwt.sign({ id: newUser.id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: newUserId, email: email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        console.log('Usuario registrado:', newUser.email);
-        // Devolver el token y un mensaje de éxito
+        console.log('Usuario registrado:', email);
         res.status(201).json({ message: 'Registro exitoso', token });
 
     } catch (error) {
@@ -65,13 +97,15 @@ app.post('/api/login', async (req, res) => {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
-    // Buscar el usuario en nuestra "base de datos" simulada
-    const user = users.find(user => user.email === email);
-    if (!user) {
-        return res.status(401).json({ message: 'Credenciales inválidas.' });
-    }
-
     try {
+        // Buscar el usuario en la base de datos
+        const [rows] = await pool.execute('SELECT id, email, password FROM users WHERE email = ?', [email]);
+        const user = rows[0];
+
+        if (!user) {
+            return res.status(401).json({ message: 'Credenciales inválidas.' });
+        }
+
         // Comparar la contraseña proporcionada con la contraseña hasheada
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
@@ -82,7 +116,6 @@ app.post('/api/login', async (req, res) => {
         const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         console.log('Usuario ha iniciado sesión:', user.email);
-        // Devolver el token
         res.status(200).json({ message: 'Inicio de sesión exitoso', token });
 
     } catch (error) {
@@ -91,13 +124,12 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Ruta de prueba (opcional, para verificar que el servidor está vivo)
+// Ruta de prueba
 app.get('/', (req, res) => {
     res.send('Server is ready for authentication!');
 });
 
-// Definir el puerto
-const port = process.env.PORT || 3001; // Usamos 3001 para el backend, 3000 o 5173 para el frontend
+const port = process.env.PORT || 3001;
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
