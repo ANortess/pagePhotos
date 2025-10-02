@@ -74,6 +74,10 @@ async function connectToDb() {
 
 connectToDb();
 
+app.get('/test', (req, res) => {
+    res.send('API is RUNNING!');
+});
+
 app.post('/api/register', async (req, res) => {
     const { email, password } = req.body;
 
