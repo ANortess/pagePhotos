@@ -14,7 +14,7 @@ const app = express();
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
 app.use(cors({
-    origin: '*', // ESTO DEBE FUNCIONAR
+    origin: 'https://photos-page-coral.vercel.app', // ESTO DEBE FUNCIONAR
     methods: 'GET,POST,OPTIONS', 
     credentials: true,
 }));
