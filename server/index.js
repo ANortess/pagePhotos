@@ -1,6 +1,6 @@
 // server/index.js
 import express from 'express';
-//import cors from 'cors';
+import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'; // Importa dotenv
@@ -13,27 +13,14 @@ const app = express();
 
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173'; 
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3306'; // Agrega tu URL de desarrollo
 
-app.use((req, res, next) => {
-    // Forzar el origen permitido con tu URL de Vercel
-    res.setHeader('Access-Control-Allow-Origin', FRONTEND_URL);
-    
-    // Forzar los métodos permitidos (incluyendo OPTIONS para el preflight)
-    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
-    
-    // Forzar los headers que el cliente puede enviar
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    // Manejar la petición OPTIONS (preflight request)
-    if (req.method === 'OPTIONS') {
-        // Responder 200 OK y terminar la petición aquí
-        return res.sendStatus(200); 
-    }
-
-    // Continuar con el resto de middlewares y rutas
-    next();
-});
+app.use(cors({
+    // ¡IMPORTANTE! Reemplaza con la URL de tu Vercel Frontend
+    origin: ALLOWED_ORIGIN
+}));
+// Middleware para parsear el cuerpo de las peticiones JSON
+app.use(express.json());
 
 // --- Configuración de la Conexión a MySQL ---
 const dbConfig = {
