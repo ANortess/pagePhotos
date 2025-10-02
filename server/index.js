@@ -11,8 +11,24 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+    'https://photos-page-coral.vercel.app', 
+    'https://photos-page-2deit091s-anortess-projects.vercel.app',
+    // Si usas localhost para desarrollo, agrégalo:
+    // 'http://localhost:3000', 
+];
+
 app.use(cors({
-    origin: 'https://photos-page-2deit091s-anortess-projects.vercel.app', // ESTO DEBE FUNCIONAR
+    origin: (origin, callback) => {
+        // Si el origen de la solicitud está en nuestra lista de permitidos, acepta.
+        // También permite solicitudes sin origen (como Postman o archivos locales).
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            // Si no está en la lista, rechaza por CORS.
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: 'GET,POST,OPTIONS', 
     credentials: true,
 }));
