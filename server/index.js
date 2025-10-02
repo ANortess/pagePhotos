@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 
-const FRONTEND_URL = 'https://photos-page-5xgmdl1kw-anortess-projects.vercel.app'; 
+const FRONTEND_URL = 'https://photos-page-3vmx3nssd-anortess-projects.vercel.app'; 
 
 app.use((req, res, next) => {
     // 1. FORZAR el origen permitido (clave para anular 'railway.com')

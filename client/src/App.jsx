@@ -29,7 +29,7 @@ function App() {
 
     return (
         <>
-            <h1>Vite + React Norte</h1>
+            <h1>Our Photos</h1>
 
             {!isLoggedIn ? (
                 // Pasa el modo actual y las funciones de callback al AuthForm
