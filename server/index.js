@@ -14,7 +14,7 @@ const app = express();
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
 app.use(cors({
-    origin: '*', // ESTO DEBE FUNCIONAR
+    origin: 'https://page-of-photos.vercel.app', // ESTO DEBE FUNCIONAR
     methods: 'GET,POST,OPTIONS', 
     credentials: true,
 }));
@@ -137,8 +137,6 @@ app.get('/', (req, res) => {
 });
 
 const port = process.env.PORT || 3001;
-
-console.log(`[CORS-FIX V3.0] Servidor iniciando con PORT: 3000`);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
