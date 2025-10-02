@@ -18,7 +18,6 @@ app.use(cors({
     methods: 'GET,POST,OPTIONS', 
     credentials: true,
 }));
-console.log('HOLA MUNDO');
 
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
@@ -58,7 +57,9 @@ async function connectToDb() {
 }
 
 connectToDb();
-
+app.get('/test', (req, res) => {
+    res.send('API is RUNNING!');
+});
 app.post('/api/register', async (req, res) => {
     const { email, password } = req.body;
 
