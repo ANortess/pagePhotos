@@ -28,10 +28,9 @@ function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
 
         const url = isLoginMode ? '/api/login' : '/api/register'; // Cambia la URL según el modo
         const body = isLoginMode ? { email, password } : { email, password }; // Para registro, solo necesitamos email y password
-        const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
         try {
-            const response = await fetch(API_BASE_URL + url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
