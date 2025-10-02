@@ -14,7 +14,7 @@ const app = express();
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
 app.use(cors({
-    origin: 'https://page-of-photos.vercel.app', // ESTO DEBE FUNCIONAR
+    origin: '*', // ESTO DEBE FUNCIONAR
     methods: 'GET,POST,OPTIONS', 
     credentials: true,
 }));
@@ -57,10 +57,8 @@ async function connectToDb() {
 }
 
 connectToDb();
-app.get('/test', (req, res) => {
-    res.send('API is RUNNING!');
-});
-app.post('/api/register', async (req, res) => {
+
+app.post('/register', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -97,7 +95,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Ruta de Inicio de Sesión
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {

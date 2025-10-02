@@ -26,7 +26,7 @@ function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
             return;
         }
 
-        const url = isLoginMode ? '/api/login' : '/api/register'; // Cambia la URL según el modo
+        const url = isLoginMode ? '/login' : '/register'; // Cambia la URL según el modo
         const body = isLoginMode ? { email, password } : { email, password }; // Para registro, solo necesitamos email y password
         const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
