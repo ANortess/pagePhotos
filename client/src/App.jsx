@@ -1,6 +1,5 @@
 // client/src/App.jsx
 import { useState } from 'react';
-import viteLogo from '/vite.svg';
 import './App.css';
 // Importa el componente renombrado
 import AuthForm from './components/AuthForm';

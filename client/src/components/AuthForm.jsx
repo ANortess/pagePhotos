@@ -1,5 +1,6 @@
 // client/src/components/AuthForm.jsx
 import React, { useState } from 'react';
+import './AuthForm.css';
 
 // Este componente ahora puede ser usado para Login o Registro
 // Recibe una prop `mode` ('login' o 'register') y una prop `onSuccess`
@@ -59,78 +60,61 @@ function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+        // Usamos la clase 'auth-container'
+        <div className="auth-container">
             <h2>{title}</h2>
             <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="email" style={{ display: 'block', marginBottom: '5px' }}>Email:</label>
+                <div className="form-group">
+                    <label htmlFor="email">Email:</label>
                     <input
                         type="email"
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ddd' }}
+                        className="auth-input" // Usamos la clase 'auth-input'
                     />
                 </div>
-                <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="password" style={{ display: 'block', marginBottom: '5px' }}>Contraseña:</label>
+                <div className="form-group">
+                    <label htmlFor="password">Contraseña:</label>
                     <input
                         type="password"
                         id="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ddd' }}
+                        className="auth-input" // Usamos la clase 'auth-input'
                     />
                 </div>
 
-                {!isLoginMode && ( // Mostrar solo en modo registro
-                    <div style={{ marginBottom: '20px' }}>
-                        <label htmlFor="confirmPassword" style={{ display: 'block', marginBottom: '5px' }}>Repetir Contraseña:</label>
+                {!isLoginMode && ( 
+                    <div className="form-group">
+                        <label htmlFor="confirmPassword">Repetir Contraseña:</label>
                         <input
                             type="password"
                             id="confirmPassword"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
-                            style={{ width: '100%', padding: '8px', boxSizing: 'border-box', borderRadius: '4px', border: '1px solid #ddd' }}
+                            className="auth-input" // Usamos la clase 'auth-input'
                         />
                     </div>
                 )}
 
-                {error && <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>}
+                {error && <p className="error-message">{error}</p>}
+                
                 <button
                     type="submit"
                     disabled={loading}
-                    style={{
-                        width: '100%',
-                        padding: '10px',
-                        backgroundColor: loading ? '#cccccc' : '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: loading ? 'not-allowed' : 'pointer',
-                        fontSize: '16px'
-                    }}
+                    className="auth-button-primary" // Usamos la clase primaria
                 >
                     {buttonText}
                 </button>
             </form>
 
             <button
-                onClick={onSwitchMode} // Usa la prop para cambiar el modo
-                style={{
-                    marginTop: '15px',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: 'transparent',
-                    color: '#007bff',
-                    border: '1px solid #007bff',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '16px'
-                }}
+                onClick={onSwitchMode}
+                className="auth-button-secondary" // Usamos la clase secundaria
             >
                 {switchModeText}
             </button>
