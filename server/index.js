@@ -11,28 +11,13 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [
-    'https://photos-page-coral.vercel.app', 
-    'https://photos-page-2deit091s-anortess-projects.vercel.app',
-    // Si usas localhost para desarrollo, agrégalo:
-    // 'http://localhost:3000', 
-];
-
+// Middleware para permitir CORS (Cross-Origin Resource Sharing)
+// Esto es crucial para que tu frontend React pueda hacer peticiones al backend
 app.use(cors({
-    origin: (origin, callback) => {
-        // Si el origen de la solicitud está en nuestra lista de permitidos, acepta.
-        // También permite solicitudes sin origen (como Postman o archivos locales).
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-        } else {
-            // Si no está en la lista, rechaza por CORS.
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: 'GET,POST,OPTIONS', 
+    origin: '*', // Permitir CUALQUIER origen, eliminando el conflicto de 'railway.com'
+    methods: 'GET,POST', // Solo permitimos GET y POST
     credentials: true,
 }));
-
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
 
@@ -42,7 +27,7 @@ const dbConfig = {
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || '',
     database: process.env.MYSQL_DATABASE || 'railway',
-    port: process.env.MYSQL_PORT || 3306,
+    port:3306,
 };
 //mysql://root:OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC@centerbeam.proxy.rlwy.net:59476/railway
 let pool; // Usaremos un pool de conexiones para mejor rendimiento
@@ -72,7 +57,7 @@ async function connectToDb() {
 
 connectToDb();
 
-app.post('/register', async (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -109,7 +94,7 @@ app.post('/register', async (req, res) => {
 });
 
 // Ruta de Inicio de Sesión
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
