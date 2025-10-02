@@ -73,9 +73,9 @@ async function connectToDb() {
 connectToDb();
 
 app.post('/register', async (req, res) => {
-    const { email, password_hash } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !password_hash) {
+    if (!email || !password) {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
@@ -87,7 +87,7 @@ app.post('/register', async (req, res) => {
         }
 
         // Hashear la contraseña antes de guardarla
-        const hashedPassword = await bcrypt.hash(password_hash, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Insertar el nuevo usuario en la base de datos
         const [result] = await pool.execute(
@@ -110,9 +110,9 @@ app.post('/register', async (req, res) => {
 
 // Ruta de Inicio de Sesión
 app.post('/login', async (req, res) => {
-    const { email, password_hash } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !password_hash) {
+    if (!email || !password) {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
@@ -126,7 +126,7 @@ app.post('/login', async (req, res) => {
         }
 
         // Comparar la contraseña proporcionada con la contraseña hasheada
-        const isMatch = await bcrypt.compare(password_hash, user.password_hash);
+        const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             return res.status(401).json({ message: 'Credenciales inválidas.' });
         }
