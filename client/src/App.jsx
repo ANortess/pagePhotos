@@ -62,16 +62,6 @@ function App() {
                     </button>
                 </div>
             )}
-
-            {/* Tus logos y otros elementos, si quieres que se muestren siempre */}
-            <div>
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src="/react.svg" className="logo react" alt="React logo" />
-                </a>
-            </div>
         </>
     );
 }
