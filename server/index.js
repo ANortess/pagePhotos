@@ -13,9 +13,12 @@ const app = express();
 
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
+const ALLOWED_ORIGIN = process.env.FRONTEND_URL || 'http://localhost:3306'; // Agrega tu URL de desarrollo
+
 app.use(cors({
-    origin: '*', // Permitir CUALQUIER origen, eliminando el conflicto de 'railway.com'
-    methods: 'GET,POST', // Solo permitimos GET y POST
+    // ¡IMPORTANTE! Reemplaza con la URL de tu Vercel Frontend
+    origin: ALLOWED_ORIGIN,
+    methods: 'GET,POST',
     credentials: true,
 }));
 // Middleware para parsear el cuerpo de las peticiones JSON
@@ -57,7 +60,7 @@ async function connectToDb() {
 
 connectToDb();
 
-app.post('/api/register', async (req, res) => {
+app.post('/register', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -94,7 +97,7 @@ app.post('/api/register', async (req, res) => {
 });
 
 // Ruta de Inicio de Sesión
-app.post('/api/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
