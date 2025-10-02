@@ -1,6 +1,5 @@
 // server/index.js
 import express from 'express';
-import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'; // Importa dotenv
@@ -11,15 +10,19 @@ dotenv.config();
 
 const app = express();
 
-// Middleware para permitir CORS (Cross-Origin Resource Sharing)
-// Esto es crucial para que tu frontend React pueda hacer peticiones al backend
-app.use(cors({
-    origin: '*', // ESTO DEBE FUNCIONAR
-    methods: 'GET,POST,OPTIONS', 
-    credentials: true,
-}));
+const VERCEL_URL = 'https://photos-page-coral.vercel.app'; 
 
-// Middleware para parsear el cuerpo de las peticiones JSON
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', VERCEL_URL); 
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); 
+    
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+    next();
+});
+
 app.use(express.json());
 
 // --- Configuración de la Conexión a MySQL ---
