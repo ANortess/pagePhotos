@@ -13,24 +13,10 @@ const app = express();
 
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
-const allowedOrigins = [
-    'https://pagephotos-production-up.railway.app', // Tu dominio de Railway
-    'http://localhost:5173' // Para desarrollo local de React
-];
-
 app.use(cors({
-    origin: (origin, callback) => {
-        // Permitir solicitudes sin origen (como Postman o solicitudes directas del mismo servidor)
-        if (!origin) return callback(null, true); 
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            // Este error de CORS que estabas viendo
-            callback(new Error('Not allowed by CORS')); 
-        }
-    },
-    credentials: true
+    origin: '*', // Permitir CUALQUIER origen, eliminando el conflicto de 'railway.com'
+    methods: 'GET,POST', // Solo permitimos GET y POST
+    credentials: true,
 }));
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
