@@ -13,11 +13,28 @@ const app = express();
 
 // Middleware para permitir CORS (Cross-Origin Resource Sharing)
 // Esto es crucial para que tu frontend React pueda hacer peticiones al backend
-app.use(cors({
-    origin: '*', // Permitir CUALQUIER origen, eliminando el conflicto de 'railway.com'
-    methods: 'GET,POST', // Solo permitimos GET y POST
-    credentials: true,
-}));
+app.use((req, res, next) => {
+    // IMPORTANTE: REEMPLAZA ESTE VALOR con la URL REAL DE TU FRONTEND EN VERCEL
+    const FRONTEND_URL = 'https://page-of-photos.vercel.app'; 
+    
+    // Si necesitas permitir varios dominios, puedes usar '*'. Pero usaremos el dominio específico.
+    res.setHeader('Access-Control-Allow-Origin', FRONTEND_URL);
+    
+    // Métodos permitidos para el CORS (GET, POST son los que usas)
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST'); 
+    
+    // Cabeceras permitidas (Content-Type es esencial para JSON)
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization'); 
+    
+    // Si la solicitud es un preflight (método OPTIONS), la respondemos inmediatamente
+    if (req.method === 'OPTIONS') {
+        // La respuesta del preflight debe ser 200 (OK)
+        return res.status(200).end();
+    }
+    
+    // Continuamos al siguiente middleware/ruta
+    next();
+});
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
 
