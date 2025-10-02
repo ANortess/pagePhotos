@@ -42,7 +42,7 @@ const dbConfig = {
     user: process.env.MYSQL_USER || 'root',
     password: process.env.MYSQL_PASSWORD || '',
     database: process.env.MYSQL_DATABASE || 'railway',
-    port:3306,
+    port: process.env.MYSQL_PORT || 3306,
 };
 //mysql://root:OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC@centerbeam.proxy.rlwy.net:59476/railway
 let pool; // Usaremos un pool de conexiones para mejor rendimiento
