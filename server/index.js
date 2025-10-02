@@ -19,10 +19,10 @@ app.use(express.json());
 
 // --- Configuración de la Conexión a MySQL ---
 const dbConfig = {
-    host: 'centerbeam.proxy.rlwy.net',
-    user: 'root',
-    password: 'OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC', // Cambia 'password' si usas root sin password localmente
-    database: 'railway',
+    host: process.env.MYSQL_HOST || 'localhost',
+    user: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || '',
+    database: process.env.MYSQL_DATABASE || 'railway',
     port:3306,
 };
 //mysql://root:OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC@centerbeam.proxy.rlwy.net:59476/railway
