@@ -1,6 +1,5 @@
 // server/index.js
 import express from 'express';
-import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'; // Importa dotenv
@@ -11,10 +10,29 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    // ¡IMPORTANTE! Reemplaza con la URL de tu Vercel Frontend
-    origin: "https://photos-page-2deit091s-anortess-projects.vercel.app/register"
-}));
+const FRONTEND_URL = 'https://photos-page-2deit091s-anortess-projects.vercel.app'; 
+
+app.use((req, res, next) => {
+    // 1. FORZAR el origen permitido (clave para anular 'railway.com')
+    res.setHeader('Access-Control-Allow-Origin', FRONTEND_URL);
+    
+    // 2. Establecer los métodos, incluyendo OPTIONS
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,PATCH,OPTIONS');
+    
+    // 3. Forzar los encabezados que el cliente puede enviar
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+    // 4. Permitir credenciales (si las usas)
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+    // Manejar la petición OPTIONS (preflight request)
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200); // Responder OK inmediatamente y terminar
+    }
+
+    next();
+});
+
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
 
