@@ -152,6 +152,8 @@ app.get('/', (req, res) => {
 
 const port = process.env.PORT || 3001;
 
+console.log(`[CORS-FIX V1.0] Servidor iniciando con PORT: ${port}`);
+
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
