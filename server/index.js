@@ -18,7 +18,6 @@ const allowedOrigins = [
     // 'http://localhost:3000', 
 ];
 
-connectToDb();
 app.use(cors({
     origin: (origin, callback) => {
         // Si el origen de la solicitud está en nuestra lista de permitidos, acepta.
@@ -71,6 +70,7 @@ async function connectToDb() {
     }
 }
 
+connectToDb();
 
 app.post('/register', async (req, res) => {
     const { email, password } = req.body;
