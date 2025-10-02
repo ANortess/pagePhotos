@@ -19,7 +19,7 @@ app.use(cors({
     // ¡IMPORTANTE! Reemplaza con la URL de tu Vercel Frontend
     origin: ALLOWED_ORIGIN,
     methods: 'GET,POST',
-    credentials: true,
+    //credentials: true,
 }));
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
