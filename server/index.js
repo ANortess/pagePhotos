@@ -1,6 +1,5 @@
 // server/index.js
 import express from 'express';
-import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv'; // Importa dotenv
@@ -11,10 +10,6 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors({
-    // ¡IMPORTANTE! Reemplaza con la URL de tu Vercel Frontend
-    origin: "https://photos-page-2deit091s-anortess-projects.vercel.app"
-}));
 // Middleware para parsear el cuerpo de las peticiones JSON
 app.use(express.json());
 
