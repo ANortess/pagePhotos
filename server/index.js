@@ -73,7 +73,6 @@ async function connectToDb() {
 }
 
 connectToDb();
-
 app.get('/test', (req, res) => {
     res.send('API is RUNNING!');
 });
