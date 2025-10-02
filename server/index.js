@@ -59,7 +59,7 @@ async function connectToDb() {
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 email VARCHAR(255) NOT NULL UNIQUE,
-                password VARCHAR(255) NOT NULL,
+                password_hash VARCHAR(255) NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -73,9 +73,9 @@ async function connectToDb() {
 connectToDb();
 
 app.post('/register', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password_hash } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password_hash) {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
@@ -87,11 +87,11 @@ app.post('/register', async (req, res) => {
         }
 
         // Hashear la contraseña antes de guardarla
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password_hash, 10);
 
         // Insertar el nuevo usuario en la base de datos
         const [result] = await pool.execute(
-            'INSERT INTO users (email, password) VALUES (?, ?)',
+            'INSERT INTO users (email, password_hash) VALUES (?, ?)',
             [email, hashedPassword]
         );
         const newUserId = result.insertId; // Obtener el ID del usuario recién insertado
@@ -110,15 +110,15 @@ app.post('/register', async (req, res) => {
 
 // Ruta de Inicio de Sesión
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password_hash } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password_hash) {
         return res.status(400).json({ message: 'Email y contraseña son requeridos.' });
     }
 
     try {
         // Buscar el usuario en la base de datos
-        const [rows] = await pool.execute('SELECT id, email, password FROM users WHERE email = ?', [email]);
+        const [rows] = await pool.execute('SELECT id, email, password_hash FROM users WHERE email = ?', [email]);
         const user = rows[0];
 
         if (!user) {
@@ -126,7 +126,7 @@ app.post('/login', async (req, res) => {
         }
 
         // Comparar la contraseña proporcionada con la contraseña hasheada
-        const isMatch = await bcrypt.compare(password, user.password);
+        const isMatch = await bcrypt.compare(password_hash, user.password_hash);
         if (!isMatch) {
             return res.status(401).json({ message: 'Credenciales inválidas.' });
         }
