@@ -1,35 +1,38 @@
-// client/src/components/AuthForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './AuthForm.css';
+import LoginForm from './LoginForm';
+import RegisterForm from './RegisterForm';
 
-// Este componente ahora puede ser usado para Login o Registro
-// Recibe una prop `mode` ('login' o 'register') y una prop `onSuccess`
 function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
+    // --- ESTADO ---
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState(''); // Nuevo para registro
+    const [confirmPassword, setConfirmPassword] = useState(''); 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    const isLoginMode = mode === 'login'; // Booleano para saber el modo actual
+    // --- VARIABLES DERIVADAS ---
+    const isLoginMode = mode === 'login';
     const title = isLoginMode ? 'Iniciar Sesión' : 'Registrarse';
-    const buttonText = isLoginMode ? 'Entrar' : 'Registrarme';
     const switchModeText = isLoginMode ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia Sesión';
 
+    // --- FUNCIÓN DE ENVÍO Y LÓGICA DE API ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setLoading(true);
 
+        // 1. Validación de Contraseñas (Solo para registro)
         if (!isLoginMode && password !== confirmPassword) {
-            setError('Las contraseñas no coinciden.');
+            setError('Contraseñas distintas');
             setLoading(false);
             return;
         }
 
-        const url = isLoginMode ? '/login' : '/register'; // Cambia la URL según el modo
-        const body = isLoginMode ? { email, password } : { email, password }; // Para registro, solo necesitamos email y password
-        const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+        // 2. Preparación de la Petición
+        const url = isLoginMode ? '/login' : '/register';
+        const body = { email, password };
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app';
 
         try {
             const response = await fetch(API_BASE_URL + url, {
@@ -42,11 +45,11 @@ function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
 
             const data = await response.json();
 
+            // 3. Manejo de Respuesta
             if (response.ok) {
-                // console.log(`${isLoginMode ? 'Login' : 'Registro'} exitoso:`, data);
                 localStorage.setItem('authToken', data.token);
                 if (onAuthSuccess) {
-                    onAuthSuccess(); // Llama a la función de éxito pasada por prop
+                    onAuthSuccess();
                 }
             } else {
                 setError(data.message || `Error al ${isLoginMode ? 'iniciar sesión' : 'registrarte'}.`);
@@ -58,63 +61,39 @@ function AuthForm({ mode, onAuthSuccess, onSwitchMode }) {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        if (error) {
+            // Establece un temporizador para limpiar el error
+            const timer = setTimeout(() => {
+                setError('');
+            }, 3000); // 3000 milisegundos = 3 segundos
 
+            // Función de limpieza de useEffect: se ejecuta si el componente se desmonta 
+            // o si 'error' cambia de nuevo antes de que se dispare el temporizador.
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
+    
+    const FormComponent = isLoginMode ? LoginForm : RegisterForm;
     return (
-        // Usamos la clase 'auth-container'
         <div className="auth-container">
-            <h2>{title}</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="auth-input" // Usamos la clase 'auth-input'
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Contraseña:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="auth-input" // Usamos la clase 'auth-input'
-                    />
-                </div>
-
-                {!isLoginMode && ( 
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Repetir Contraseña:</label>
-                        <input
-                            type="password"
-                            id="confirmPassword"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            className="auth-input" // Usamos la clase 'auth-input'
-                        />
-                    </div>
-                )}
-
-                {error && <p className="error-message">{error}</p>}
-                
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="auth-button-primary" // Usamos la clase primaria
-                >
-                    {buttonText}
-                </button>
-            </form>
+            <h2><span className="title-text">{title}</span></h2>
+            
+            <FormComponent 
+                email={email}
+                setEmail={setEmail}
+                password={password}
+                setPassword={setPassword}
+                confirmPassword={confirmPassword}
+                setConfirmPassword={setConfirmPassword}
+                error={error}
+                loading={loading}
+                handleSubmit={handleSubmit}
+            />
 
             <button
                 onClick={onSwitchMode}
-                className="auth-button-secondary" // Usamos la clase secundaria
+                className="auth-button-secondary"
             >
                 {switchModeText}
             </button>

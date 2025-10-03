@@ -1,26 +1,44 @@
 /* Contenedor principal del formulario */
 .auth-container {
-    max-width: 400px;
-    margin: 50px auto;
+    max-width: 380px;
+    margin: 3% 3% 3% 3%; 
     padding: 30px;
-    border: 1px solid #333; /* Borde más oscuro para fondo oscuro */
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Sombra más pronunciada */
-    background-color: #1e1e1e; /* Fondo oscuro */
-    color: #f0f0f0; /* Texto claro */
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(172, 148, 148, 0.447); /* Sombra más pronunciada */
+    background-color: hsla(0, 0%, 98%, 0.447); /* Fondo oscuro */
+    color: rgb(208, 111, 111); /* Texto claro */
     font-family: Arial, sans-serif;
+    font-size: 26px;
+}
+
+@media (min-width: 768px) {
+    .auth-container {
+        /* En escritorio: Mantenemos el anclaje a 50px de la derecha */
+        margin: 0 15% 0 auto; 
+    }
 }
 
 /* Encabezado */
 .auth-container h2 {
     text-align: center;
-    margin-bottom: 25px;
-    color: #4CAF50; /* Color primario (verde) */
+    margin-bottom: 20px;
+    color: rgb(188, 102, 102);
+    text-shadow: 
+        1px 1px 0px #dfacac,       /* Sombra clara (relieve) */
+        3px 3px 5px rgba(91, 91, 91, 0.5); /* Sombra oscura (profundidad) */
+
+    transition: transform 0.2s ease-out; /* Transición para el zoom suave */
+    /* Quitamos el cursor de h2 y lo ponemos aquí para que sea más específico */
+    cursor: pointer; 
 }
 
+/* EFECTO DE HOVER SOLO EN LAS LETRAS */
+.auth-container h2:hover {
+    transform: scale(1.03); /* Aumenta el tamaño de las letras en un 8% */
+}
 /* Grupos de campos (label + input) */
 .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 24px;
 }
 
 .form-group label {
@@ -36,46 +54,84 @@
     padding: 12px;
     box-sizing: border-box;
     border-radius: 6px;
-    border: 1px solid #555;
-    background-color: #2b2b2b; /* Fondo del input ligeramente más claro */
-    color: #f0f0f0;
+    border: 1px solid rgb(208, 111, 111);
+    background-color: hsla(0, 0%, 98%, 0.447); /* Fondo oscuro */
+    color: #cd7878;
     transition: border-color 0.3s;
-}
-
-.auth-input:focus {
-    border-color: #4CAF50;
     outline: none;
 }
 
-/* Mensajes de error */
-.error-message {
-    color: #ff5252; /* Rojo vibrante */
-    margin-bottom: 15px;
-    font-weight: bold;
-    text-align: center;
+
+.auth-input::placeholder {
+  color: #cd7878; /* Gris claro, cambia el color a tu gusto */
+  opacity: 0.8; /* Asegura que no sea transparente por defecto */
+  font-style: italic; /* Opcional: para diferenciarlo */
+}
+
+.auth-input:-webkit-autofill,   /* AUTOCOMPLETADO */
+.auth-input:-webkit-autofill:hover, 
+.auth-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px #ffffff00 inset !important; 
+    -webkit-text-fill-color: #cd7878 !important; 
+    transition: background-color 5000s ease-in-out 0s;
 }
 
 /* Botón principal (Login/Register) */
 .auth-button-primary {
     width: 100%;
     padding: 12px;
-    background-color: #4CAF50; /* Verde primario */
-    color: white;
+    background-color: #e47977;
     border: none;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.463);
     border-radius: 6px;
     cursor: pointer;
     font-size: 1em;
     font-weight: bold;
     transition: background-color 0.3s;
 }
+.auth-button-primary .button-text-content {
+    display: inline-block;
+    transition: transform 0.2s ease-out; /* Transición suave */
+}
+
+/* Aplica el escalado al SPAN cuando el usuario pasa el cursor sobre el BOTÓN */
+.auth-button-primary:hover .button-text-content {
+    transform: scale(1.08); /* Escala el texto al 110% */
+}
+
+.auth-button-primary:hover .button-text-content-nothing {
+    transform: scale(1); /* Escala el texto al 110% */
+}
 
 .auth-button-primary:hover:not(:disabled) {
-    background-color: #45a049;
+    background-color: #ca6a68;
 }
 
 .auth-button-primary:disabled {
-    background-color: #666;
     cursor: not-allowed;
+}
+
+.auth-button-loading {
+    background-color: #ca6a68 !important; /* Azul sutil */
+    cursor: progress !important; /* Muestra el icono de progreso */
+    animation: pulse 1s infinite alternate; /* Animación de pulsación */
+}
+
+@keyframes pulse {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.8;
+    }
+}
+
+.auth-button-error {
+    background-color: #c65250 !important;
+    color: white !important;
+    font-weight: bold;
+    transition: background-color 0.3s ease-in-out;
 }
 
 /* Botón de cambio de modo (Switch Mode) */
@@ -84,8 +140,8 @@
     width: 100%;
     padding: 10px;
     background-color: transparent;
-    color: #4CAF50; /* Texto verde */
-    border: 1px solid #4CAF50; /* Borde verde */
+    color: #e47977; /* Texto verde */
+    border: 1px solid #e47977; /* Borde verde */
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.95em;
@@ -93,6 +149,6 @@
 }
 
 .auth-button-secondary:hover {
-    background-color: #4CAF50;
-    color: #1e1e1e; /* Texto oscuro al pasar el ratón */
+    background-color: #eabebc78;
+    color: #c05e5c; /* Texto oscuro al pasar el ratón */
 }

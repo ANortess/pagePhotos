@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 
-const FRONTEND_URL = 'https://photos-page-coral.vercel.app'; 
+const FRONTEND_URL = process.env.MYSQL_URLFRONTEND || '*'; 
 
 app.use((req, res, next) => {
     // 1. FORZAR el origen permitido (clave para anular 'railway.com')
@@ -38,11 +38,11 @@ app.use(express.json());
 
 // --- Configuración de la Conexión a MySQL ---
 const dbConfig = {
-    host: process.env.MYSQL_HOST || 'localhost',
+    host: process.env.MYSQL_HOST || 'centerbeam.proxy.rlwy.net',
     user: process.env.MYSQL_USER || 'root',
-    password: process.env.MYSQL_PASSWORD || '',
+    password: process.env.MYSQL_PASSWORD || 'OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC',
     database: process.env.MYSQL_DATABASE || 'railway',
-    port:3306,
+    port:59476,
 };
 //mysql://root:OyZfHJcIUlWYRZOpuBTAdMvFKjzRXOBC@centerbeam.proxy.rlwy.net:59476/railway
 let pool; // Usaremos un pool de conexiones para mejor rendimiento
@@ -83,7 +83,7 @@ app.post('/register', async (req, res) => {
         // Verificar si el usuario ya existe en la base de datos
         const [rows] = await pool.execute('SELECT id FROM users WHERE email = ?', [email]);
         if (rows.length > 0) {
-            return res.status(409).json({ message: 'El usuario con este email ya existe.' });
+            return res.status(409).json({ message: 'El email ya existe' });
         }
 
         // Hashear la contraseña antes de guardarla
@@ -122,13 +122,13 @@ app.post('/login', async (req, res) => {
         const user = rows[0];
 
         if (!user) {
-            return res.status(401).json({ message: 'Credenciales inválidas.' });
+            return res.status(401).json({ message: 'No coinciden los datos' });
         }
 
         // Comparar la contraseña proporcionada con la contraseña hasheada
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Credenciales inválidas.' });
+            return res.status(401).json({ message: 'No coinciden los datos' });
         }
 
         // Si las credenciales son correctas, generar un token JWT
