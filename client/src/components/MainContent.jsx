@@ -21,7 +21,7 @@ function MainContent({ handleLogout }) {
         setIsAddModalOpen('settings');
     };
     
-    const API_BASE_URL = 'http://localhost:3001';
+    const API_BASE_URL = process.env.MYSQL_URLFRONTEND || 'http://localhost:3001';
     useEffect(() => {
         const fetchAlbums = async () => {
             const token = localStorage.getItem('authToken');
