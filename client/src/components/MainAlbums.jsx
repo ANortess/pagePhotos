@@ -27,7 +27,7 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     const fileInputRef = useRef(null); // Ref para el input de archivo oculto
     const [pendingUploads, setPendingUploads] = useState(0);
     const [albumPhotos, setAlbumPhotos] = useState([]); // Para almacenar las fotos cargadas
-    const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001';
+    const API_BASE_URL = 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
 
     const fetchPhotos = async (albumId) => {
         const token = localStorage.getItem('authToken');

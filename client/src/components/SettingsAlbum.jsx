@@ -104,7 +104,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
         }
 
         try {
-            const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001';
+            const API_BASE_URL = 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
             const response = await fetch(`${API_BASE_URL}/albums/${albumIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
