@@ -18,7 +18,7 @@ body {
 }
 .app-auth-mode {
     /* Aquí pones el fondo y color del formulario */
-    background-image: url('./src/assets/background.jpg');
+    background-image: url('./background.jpg');
     background-size: cover;
     background-attachment: fixed;
     background-position: center center;
@@ -32,7 +32,7 @@ body {
 /* Estilos para el estado de APLICACIÓN PRINCIPAL (Logueado) */
 .app-main-mode {
     /* Fondo para la pantalla principal (distinto) */
-    background-image: url('./src/assets/background.jpg'); /* <--- USA ESTA RUTA RELATIVA */
+    background-image: url('./background.jpg'); /* <--- USA ESTA RUTA RELATIVA */
     background-size: cover; /* Asegura que la imagen cubra toda la pantalla */
     background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll (opcional) */
     background-position: center center;

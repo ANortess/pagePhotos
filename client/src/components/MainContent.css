@@ -72,7 +72,7 @@
     transform: none;
 }
 .options-button {
-    background-image: url('./src/assets/options-image.jpg');
+    background-image: url('./options-image.jpg');
     background-size: cover;
     background-position: center;
     border: none;

@@ -21,7 +21,7 @@ function MainContent({ handleLogout }) {
         setIsAddModalOpen('settings');
     };
     
-    const API_BASE_URL = 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
     useEffect(() => {
         const fetchAlbums = async () => {
             const token = localStorage.getItem('authToken');
