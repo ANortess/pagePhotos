@@ -62,7 +62,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
         }
 
         try {
-            const API_BASE_URL = process.env.MYSQL_URLFRONTEND || 'http://localhost:3001'; // Define tu URL base
+            const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001'; // Define tu URL base
             const response = await fetch(`${API_BASE_URL}/albums/${album.id}`, {
                 method: 'PATCH',
                 headers: {
@@ -104,7 +104,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
         }
 
         try {
-            const API_BASE_URL = process.env.MYSQL_URLFRONTEND || 'http://localhost:3001';
+            const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001';
             const response = await fetch(`${API_BASE_URL}/albums/${albumIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
