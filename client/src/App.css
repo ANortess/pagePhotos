@@ -8,7 +8,7 @@ body {
 
   min-height: 100vh;
     min-height: 100svh;
-    
+
   color: #333; /* Color de texto predeterminado */
   box-sizing: border-box;
 }
@@ -19,8 +19,9 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
 .app-auth-mode {
-    /* Aquí pones el fondo y color del formulario */
+    /* Aquí pones el fondo y color del formulario eso*/
     background-image: url('./assets/background.jpg');
     background-size: cover;
     background-attachment: fixed;
