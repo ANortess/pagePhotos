@@ -1,6 +1,6 @@
 .auth-container {
     max-width: 380px;
-    margin: 3% 5% 3% auto; 
+    margin: 3% 10% 3% auto;
     padding: 30px;
     border-radius: 20px;
     box-shadow: 0 4px 12px rgba(172, 148, 148, 0.447); /* Sombra más pronunciada */
@@ -12,9 +12,7 @@
 
 @media (max-width: 600px) {
     .auth-container {
-        margin: 3% 3% 3% 3%; 
-        max-width: calc(100% - 30px);
-        width: 90%;
+        margin: auto 3% auto 3%;
     }
 }
 /* Encabezado */
