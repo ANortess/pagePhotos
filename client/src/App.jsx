@@ -23,20 +23,24 @@ function App() {
     };
 
     return (
-        <div className={'app-main'}>
-            {!isLoggedIn ? (
-                // Pasa el modo actual y las funciones de callback al AuthForm
-                <AuthForm
-                    mode={authMode}
-                    onAuthSuccess={handleAuthSuccess}
-                    onSwitchMode={handleSwitchAuthMode}
-                />
-            ) : (
-                <MainContent 
-                    handleLogout={handleLogout} 
-                />
-            )}
-        </div>
+        <>
+            <div className={'background-fixed-layer'}></div> 
+            
+            <div className={'app-main'}>
+                {!isLoggedIn ? (
+                    // Pasa el modo actual y las funciones de callback al AuthForm
+                    <AuthForm
+                        mode={authMode}
+                        onAuthSuccess={handleAuthSuccess}
+                        onSwitchMode={handleSwitchAuthMode}
+                    />
+                ) : (
+                    <MainContent 
+                        handleLogout={handleLogout} 
+                    />
+                )}
+            </div>
+        </>
         
     );
 }
