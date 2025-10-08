@@ -71,7 +71,7 @@ async function connectToDb() {
             )
         `);
         console.log('Tabla de usuarios verificada/creada');
-        
+
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS albums (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,7 +79,6 @@ async function connectToDb() {
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
                 cover_photo_url VARCHAR(512),
                 
                 /* Definir la clave foránea que enlaza con la tabla users */

@@ -187,7 +187,7 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
         // Opcional: Mostrar un loading o deshabilitar la interfaz
 
         try {
-            const response = await fetch(`/api/albums/${albumId}/cover`, {
+            const response = await fetch(`${API_BASE_URL}/albums/${albumId}/cover`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
