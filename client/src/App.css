@@ -32,13 +32,11 @@ body {
 
 @media (max-width: 600px) {
     .app-main-mode {
-      align-items: flex-start; 
-      min-height: 90vh;
+      align-items: flex-start;
     }
 
     .app-auth-mode {
-      align-items: flex-start; 
-      min-height: 90vh;
+      align-items: flex-start;
     }
 }
 

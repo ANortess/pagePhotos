@@ -39,14 +39,11 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
             break;
         case "_delete":
             modalTitle = album.title;
+            break;
+        default:
+            modalTitle = album.title;
+            break;
     }
-
-    /*React.useEffect(() => {
-        if (mode === '_edit') {
-            setEditTitle(album.title);
-            setEditDescription(album.description || '');
-        }
-    }, [mode, album]);*/
 
     const handleSaveEdit = async () => {
         const token = localStorage.getItem('authToken');
