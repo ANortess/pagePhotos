@@ -19,11 +19,7 @@ body {
 }
 
 @media (max-width: 600px) {
-  .app-main-mode {
-    align-items: flex-start;
-  }
-
-  .app-auth-mode {
+  .app-main {
     align-items: flex-start;
   }
 }
