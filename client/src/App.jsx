@@ -12,8 +12,6 @@ function App() {
         setIsLoggedIn(true);
     };
 
-    const appContainerClass = isLoggedIn ? 'app-main-mode' : 'app-auth-mode';
-
     const handleSwitchAuthMode = () => {
         setAuthMode(prevMode => (prevMode === 'login' ? 'register' : 'login'));
     };
@@ -25,7 +23,7 @@ function App() {
     };
 
     return (
-        <div className={`app-container-wrapper ${appContainerClass}`}>
+        <div className={'app-main'}>
             {!isLoggedIn ? (
                 // Pasa el modo actual y las funciones de callback al AuthForm
                 <AuthForm
