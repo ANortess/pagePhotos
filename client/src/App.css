@@ -3,6 +3,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
+  overflow: hidden;
 }
 .background-fixed-layer {
     /* La clave para que se fije a la pantalla entera y no se mueva */
@@ -23,7 +24,7 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   width: 100%;
-  
+
   display: flex; 
   justify-content: center;
   align-items: flex-start;
