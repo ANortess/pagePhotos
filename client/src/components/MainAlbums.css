@@ -27,60 +27,50 @@
 
 .albums-grid {
     display: grid;
+    column-gap: 10px;
+    row-gap: 10px;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
-    gap: 10px;
-    padding: 0;
+    box-sizing: border-box; 
+    padding: 10px;
     width: 100%;
-    height: 100%;
     overflow-y: auto;
     justify-content: center;
+
 }
 
 .album-card {
     background-color: rgb(235, 255, 232);
     border-radius: 10px;
+    overflow: hidden;
+    padding: 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 10px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    height: 200px; /* Altura fija para el cuadrado, ajústala a tu gusto */
     display: flex;
+    height: 250px;
     flex-direction: column;
     justify-content:flex-end;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
-@media (max-width: 600px) {
-    /* 1. Ajuste de la Cuadrícula para Pantallas Pequeñas */
-    .albums-grid {
-        /* Reducimos el tamaño mínimo de las columnas para que quepan más */
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-        gap: 15px; /* Ajustamos el espacio entre las tarjetas */
-        padding: 0px; /* Reducimos el padding general */
-    }
 
-    /* 2. Reducción del Tamaño de la Tarjeta */
-    .album-card {
-        height: 150px; /* 🔥 Reducimos la altura de la tarjeta */
-        padding: 8px; /* Reducimos el padding interior */
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
-    }
-
-    .album-title {
-        font-size: 10px;
-    }
-}
 .album-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-.album-title {
+.album-title-container {
+    background-color: #fbcaca;
+    padding: 5px 5px; 
+    width: 100%;
+    margin-top: auto; 
+}
+
+.album-title-text {
     font-weight: bold;
     color: #333;
-    margin-bottom: 10px;
-    font-size: 10px;
+    font-size: 15px;
     word-break: break-word;
+    display: block;
 }
 
 
@@ -121,5 +111,22 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+    .albums-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        padding: 0;
+    }
+
+    .album-card {
+        height: 200px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .album-title {
+        font-size: 10px;
+    }
 }
 

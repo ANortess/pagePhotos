@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './MainAlbums.css';
 import './OptionsContent.css';
 
-function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelete, OnShowAllAlbums, onAlbumDeleted  }){
+function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate, onDelete, OnShowAllAlbums, onAlbumDeleted, onSetCover  }){
     const [editTitle, setEditTitle] = useState(album.title);
     const [editDescription, setEditDescription] = useState(album.description || '');
 
@@ -39,6 +39,9 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
             break;
         case "_delete":
             modalTitle = album.title;
+            break;
+        case "_cover":
+            modalTitle = "Cambiar portada"
             break;
         default:
             modalTitle = album.title;
@@ -124,6 +127,11 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
             alert('Error de red al intentar borrar el álbum.');
         }
     };
+
+    const handleSetCover = () => {
+        onClose();
+        onSetCover();
+    }
     // 3. Renderizado del contenido basado en el modo
     const content = (
         <>
@@ -157,6 +165,9 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
                     </div>
                     {/* Puedes añadir más campos de edición aquí */}
                     <div className="modal-buttons">
+                        <button onClick={onCover} className="modal-yes-button">Cambiar portada</button>
+                    </div>
+                    <div className="modal-buttons">
                         <button onClick={handleSaveEdit} className="modal-yes-button">Guardar</button>
                         <button onClick={onInfo} className="modal-no-button">Volver</button>
                     </div>
@@ -177,6 +188,22 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onClose, onUpdate, onDelet
                 </>
             )}
 
+
+            {mode == '_cover' && (
+                <>
+                    <p>¿Qué portada quieres poner?</p>
+
+                    <div className="modal-buttons">
+                        <button onClick={handleSetCover} className="modal-yes-button">Elegir</button>
+                    </div>
+                    <div className="modal-buttons">
+                        <button  className="modal-yes-button">Guardar</button>
+                        <button onClick={onEdit} className="modal-no-button">Volver</button>
+                    </div>
+                </>
+            )}
+
+            
             {mode === '_delete' && (
                 <>
                     <p>Desde el {formattedDate}</p>

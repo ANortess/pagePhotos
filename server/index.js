@@ -71,7 +71,7 @@ async function connectToDb() {
             )
         `);
         console.log('Tabla de usuarios verificada/creada');
-
+        
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS albums (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -79,6 +79,8 @@ async function connectToDb() {
                 title VARCHAR(255) NOT NULL,
                 description TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                cover_photo_url VARCHAR(512),
                 
                 /* Definir la clave foránea que enlaza con la tabla users */
                 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -238,7 +240,7 @@ app.get('/albums', verifyToken, async (req, res) => {
     try {
         // Consultar solo los álbumes que coinciden con el ID del usuario
         const [albums] = await pool.execute(
-            'SELECT id, title, description, DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at FROM albums WHERE user_id = ? ORDER BY created_at DESC', 
+            'SELECT id, title, description, cover_photo_url, DATE_FORMAT(created_at, "%Y-%m-%d %H:%i:%s") AS created_at FROM albums WHERE user_id = ? ORDER BY created_at DESC', 
             [userId]
         );
 
@@ -303,6 +305,33 @@ app.delete('/albums/:id', verifyToken, async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar álbum:', error);
         res.status(500).json({ message: 'Error interno del servidor al eliminar álbum.' });
+    }
+});
+
+app.patch('/albums/:albumId/cover', verifyToken, async (req, res) => {
+    const albumId = req.params.albumId;
+    const userId = req.userId;
+    const { photoUrl } = req.body; // El frontend enviará la URL completa de Cloudinary
+
+    if (!photoUrl) {
+        return res.status(400).json({ message: 'La URL de la foto de portada es obligatoria.' });
+    }
+
+    try {
+        const [result] = await pool.execute(
+            'UPDATE albums SET cover_photo_url = ? WHERE id = ? AND user_id = ?',
+            [photoUrl, albumId, userId]
+        );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Álbum no encontrado o no autorizado.' });
+        }
+
+        res.status(200).json({ message: 'Portada del álbum actualizada.', coverUrl: photoUrl });
+
+    } catch (error) {
+        console.error('Error al actualizar la portada:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
     }
 });
 

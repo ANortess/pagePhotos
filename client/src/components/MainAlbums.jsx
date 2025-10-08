@@ -10,7 +10,9 @@ function AlbumCard({ album, onAlbumClick  }) {
             className="album-card"
             onClick={() => onAlbumClick(album)}
         >
-            <span className="album-title">{album.title}</span>
+            <div className="album-title-container"> 
+                <span className="album-title-text">{album.title}</span>
+            </div>
         </div>
     );
 }
@@ -28,6 +30,13 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     const [pendingUploads, setPendingUploads] = useState(0);
     const [albumPhotos, setAlbumPhotos] = useState([]); // Para almacenar las fotos cargadas
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
+
+    const [isCoverSelectionMode, setIsCoverSelectionMode] = useState(false);
+    
+    const toggleCoverSelectionMode = () => {
+        // Al hacer clic en el botón "Cambiar Portada"
+        setIsCoverSelectionMode(prevMode => !prevMode);
+    };
 
     const fetchPhotos = async (albumId) => {
         const token = localStorage.getItem('authToken');
@@ -73,6 +82,10 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
 
     const handleEditDetails = () => {
         setStateOfSettings('_edit');
+    };
+
+    const handleCoverDetails = () => {
+        setStateOfSettings('_cover');
     };
 
     const handleDeleteAlbum = () => {
@@ -166,6 +179,53 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
         }
     };
 
+    const handleSetCover = async (photoUrl) => {
+        // ⚠️ Asegúrate de tener el token y el ID del álbum disponibles
+        const authToken = localStorage.getItem('authToken');
+        const albumId = selectedAlbum.id; 
+
+        // Opcional: Mostrar un loading o deshabilitar la interfaz
+
+        try {
+            const response = await fetch(`/api/albums/${albumId}/cover`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                },
+                body: JSON.stringify({ photoUrl }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al establecer la portada en el servidor.');
+            }
+            
+            // Actualizar el estado del álbum seleccionado para reflejar la nueva portada inmediatamente
+            setSelectedAlbum(prevAlbum => ({
+                ...prevAlbum,
+                cover_photo_url: photoUrl // ¡Actualizamos la URL de la portada!
+            }));
+
+            // Desactivar el modo de selección después de la acción exitosa
+            setIsCoverSelectionMode(false); 
+            
+        } catch (error) {
+            console.error('Fallo al actualizar la portada:', error);
+            alert('No se pudo cambiar la portada.');
+        }
+    };
+
+    const handlePhotoClick = (photoUrl) => {
+        if (isCoverSelectionMode) {
+            // Modo A: Si está activo, establece la portada
+            handleSetCover(photoUrl);
+        } else {
+            // Modo B: Si NO está activo, haz otra cosa (ej: abrir visor de fotos)
+            console.log(`Abriendo visor para la foto: ${photoUrl}`);
+            // Aquí iría tu lógica para abrir el modal de la foto en grande
+        }
+    };
+
     return (
         <>
             {modalMode === 'viewAllAlbums' && (
@@ -245,12 +305,20 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                                 
                                 {albumPhotos.length > 0 ? (
                                     albumPhotos.map(photo => (
-                                        <div key={photo.id} className="photo-card">
+                                        <div 
+                                            key={photo.id} 
+                                            className={`photo-card ${isCoverSelectionMode ? 'cover-select-mode' : ''}`}
+                                            onClick={() => handlePhotoClick(photo.url)}
+                                        >
                                             <img 
                                                 src={photo.url} 
                                                 alt={`Foto ${photo.id}`} 
                                                 className="album-photo"
                                             />
+
+                                            {isCoverSelectionMode && (
+                                                <div className="cover-overlay">TOCA PARA PORTADA</div>
+                                            )}
                                         </div>
                                     ))
                                 ) : (
@@ -294,14 +362,11 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                                 <button 
                                     onClick={() => fileInputRef.current.click()} 
                                     className="addAlbum-button"
-                                    // 🔥 Ahora se deshabilita si pendingUploads > 0
                                     disabled={pendingUploads > 0}
                                 >
-                                    {/* 🔥 Muestra el estado según el contador */}
                                     {pendingUploads > 0 ? `Subiendo... (${pendingUploads})` : 'Añadir'}
                                 </button>
 
-                                {/* Botón Volver (salir del modo edición) */}
                                 <button 
                                     onClick={editPhotosModal} 
                                     className="addAlbum-button modalPhotos-no-button"
@@ -328,11 +393,13 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                             mode={stateOfSettings}
                             onInfo={handleInfoDetails}
                             onEdit={handleEditDetails}
+                            onCover={handleCoverDetails}
                             onClose={handleCloseDetails}
                             onUpdate={handleUpdateAlbum}
                             onDelete={handleDeleteAlbum}
                             OnShowAllAlbums={showAllAlbums}
                             onAlbumDeleted={handleAlbumDeleted} 
+                            onSetCover={toggleCoverSelectionMode}
                         />
                     )}
 

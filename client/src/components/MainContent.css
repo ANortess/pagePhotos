@@ -10,7 +10,6 @@
 .welcome-content {
     background-color: hsla(0, 0%, 98%, 0.447); /* Gris oscuro */
     color: #ecf0f1; /* Texto blanco/gris claro */
-    padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(172, 148, 148, 0.447); /* Sombra más pronunciada */
     text-align: center;
@@ -19,12 +18,14 @@
     width: calc(100% - 20px); /* 👈 Ajustamos el ancho para que quepa dentro de los márgenes del 10px */
     height: calc(100vh - 80px); /* 👈 Ocupa toda la altura (100vh) menos los 10px de margen superior e inferior */
     margin: 20px; /* 👈 Margen de 10px en todos los lados */
+    padding: 20px;
 
     display: flex;
     flex-direction: column;
 }
 
 .name-of-page {
+    margin-top: 5px;
     color: rgb(208, 111, 111); /* Verde para el título de bienvenida */
     font-family: Arial, sans-serif;
     font-size: 40px;
@@ -33,10 +34,10 @@
 
 .gallery-content {
     margin-top: 20px;
+    margin-bottom: 10px;
     flex-grow: 1;
     overflow-y: auto; 
     padding: 10px;
-    margin-bottom: 10px;
     border: none;
     text-align: left; 
     color: #444;
@@ -99,7 +100,16 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.addAlbum-button:active {
-    transform: translateY(0);
-    box-shadow: none;
+
+@media (max-width: 600px) {
+    .welcome-content {
+        margin: 10px;
+        padding: 5px;
+        height: calc(100vh - 30px);
+    }
+
+    .gallery-content {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
 }
