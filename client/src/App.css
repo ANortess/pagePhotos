@@ -8,18 +8,19 @@ body {
 .app-main {
   background-image: url('./assets/background.jpg');
   background-size: cover;
-  background-attachment: fixed;
   background-position: center center;
   min-height: 100vh;
+  min-height: 100svh;
   width: 100%;
   display: flex; 
   justify-content: center;
-  align-items: center; 
+    align-items: flex-start;
 }
 
-@media (max-width: 600px) {
+@media (min-width: 600px) {
   .app-main {
-    align-items: flex-start;
+    background-attachment: fixed;
+    align-items: center; 
   }
 }
 
