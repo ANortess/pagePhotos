@@ -4,40 +4,42 @@ body {
 }
 
 .app-auth-mode {
-    /* Aquí pones el fondo y color del formulario eso*/
-    background-image: url('./assets/background.jpg');
-    background-size: cover;
-    background-attachment: fixed;
-    background-position: center center;
-    width: 100%;
-    min-height: 100vh;
-    display: flex; 
-    justify-content: center;
-    align-items: center; 
+  /* Aquí pones el fondo y color del formulario eso*/
+  background-image: url('./assets/background.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex; 
+  justify-content: center;
+  align-items: center; 
 }
 
 /* Estilos para el estado de APLICACIÓN PRINCIPAL (Logueado) */
 .app-main-mode {
-    /* Fondo para la pantalla principal (distinto) */
-    background-image: url('./assets/background.jpg'); /* <--- USA ESTA RUTA RELATIVA */
-    background-size: cover; /* Asegura que la imagen cubra toda la pantalla */
-    background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll (opcional) */
-    background-position: center center;
-    width: 100%;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center; 
+  /* Fondo para la pantalla principal (distinto) */
+  background-image: url('./assets/background.jpg'); /* <--- USA ESTA RUTA RELATIVA */
+  background-size: cover; /* Asegura que la imagen cubra toda la pantalla */
+  background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll (opcional) */
+  background-position: center center;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
 }
 
 @media (max-width: 600px) {
-    .app-main-mode {
-      align-items: flex-start;
-    }
+  .app-main-mode {
+    align-items: flex-start;
+  }
 
-    .app-auth-mode {
-      align-items: flex-start;
-    }
+  .app-auth-mode {
+    align-items: flex-start;
+  }
 }
 
 
