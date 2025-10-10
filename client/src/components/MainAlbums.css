@@ -9,6 +9,7 @@
 }
 
 .photo-card {
+    position: relative;
     overflow: hidden; 
     height: 300px;
     display: flex; 
@@ -108,7 +109,6 @@
     text-align: center;
 }
 
-/* Spinner básico (puedes usar un GIF o CSS más complejo) */
 .spinner {
     border: 4px solid rgba(0, 0, 0, 0.1);
     border-top: 4px solid #3498db; 
@@ -117,6 +117,28 @@
     height: 30px;
     animation: spin 1s linear infinite; /* Animación de giro */
     margin: 10px auto 0;
+}
+
+.photo-card.selected-for-delete::after {
+    content: ''; /* Debe tener contenido */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5; /* Un z-index bajo para el overlay, pero más alto que la imagen (que tiene z-index: auto/0) */
+    
+    /* 🔥 CREA EL EFECTO DE MARCO/BORDE VISIBLE */
+    border: 2px solid rgb(210, 113, 113); /* Tu borde de 4px rojo/rosa */
+    
+    /* OPCIONAL: Fondo semitransparente para que la imagen se vea atenuada */
+    background-color: rgba(210, 113, 113, 0.124); 
+    
+    /* IMPORTANTE: Incluye el borde en el cálculo del 100% */
+    box-sizing: border-box; 
+    
+    /* El resto de estilos para el "tick" DEBEN moverse a ::before o a una clase separada
+       porque este ::after ahora es un marco de 100% */
 }
 
 @keyframes spin {
@@ -141,7 +163,7 @@
     }
 
     .photo-card {
-        height: 150px;
+        height: 100px;
     }
 }
 

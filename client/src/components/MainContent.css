@@ -110,6 +110,10 @@
 
     .gallery-content {
         margin-top: 5px;
+        margin-bottom: 10px;
+    }
+
+    .main-buttons {
         margin-bottom: 5px;
     }
 }

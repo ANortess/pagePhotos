@@ -28,6 +28,8 @@ function AlbumCard({ album, onAlbumClick  }) {
 
 function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, handleNone, onOpenAddAlbum, onOpenSettings, handleLogout}) { // 🔥 Recibe la lista de álbumes como prop
     const albumList = Array.isArray(albums) ? albums : [];
+    const [selectedPhotoIds, setSelectedPhotoIds] = useState([]);
+
     const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
     const [modalMode, setModalMode] = useState('viewAllAlbums'); 
@@ -42,6 +44,8 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
 
     const [isCoverSelectionMode, setIsCoverSelectionMode] = useState(false);
+    const [isDeleteSelectionMode, setIsDeleteSelectionMode] = useState(false);
+    const [isDeletePhotosConfirm, setIsDeletePhotosConfirm] = useState(false);
 
     
     const toggleCoverSelectionMode = () => {
@@ -100,17 +104,18 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     };
 
     const handleDeleteAlbum = () => {
+        console.log("asdad")
         setStateOfSettings('_deleteAlbum');
+    };
+
+    const handleDeletePhoto = () => {
+        setStateOfSettings('_deletePhoto');
     };
 
     const handleViewPhoto = (photo) => {
         setSelectedPhoto(photo);
         setStateOfSettings('_viewPhoto');
     }
-
-    const handleDeletePhoto = () => {
-        setStateOfSettings('_deletePhoto');
-    };
 
     const handleCloseDetails = () => {
         handleNone();
@@ -135,12 +140,22 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     };
     
     const handleOpenSettingsModal = () => {
-        onOpenSettings(); 
-        setStateOfSettings('_info');
+        if (isEditModePhotos) {
+            // En lugar de abrir el modal de settings, inicia el modo de selección
+            toggleDeleteSelectionMode();
+        } else {
+            // Si no estás en edición, abre el modal de detalles del álbum
+            onOpenSettings(); 
+            setStateOfSettings('_info');
+        }
     };
 
     const toggleOptionsMenu = () => {
         setIsOptionsMenuOpen(prev => !prev);
+    };
+
+    const toggleDeletePhotosConfirm = () => {
+        setIsDeletePhotosConfirm(prev => !prev);
     };
 
     const editPhotosModal = () => {
@@ -282,13 +297,82 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
         }
     };
 
+    const deleteMultiplePhotos = async () => {
+        if (selectedPhotoIds.length === 0 || !selectedAlbum) return;
+        
+        const albumId = selectedAlbum.id;
+        const token = localStorage.getItem('authToken');
+        let successfulDeletions = 0;
+        
+        // Opcional: Mostrar un estado de "Borrando en lote..."
+        // Inicia el proceso de eliminación para cada ID
+        
+        const deletionPromises = selectedPhotoIds.map(photoId => 
+            // Reutiliza tu función deletePhoto, o la lógica de la API
+            fetch(`${API_BASE_URL}/albums/${albumId}/photos/${photoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+            .then(response => {
+                if (response.ok || response.status === 204) {
+                    successfulDeletions++;
+                    return { success: true, id: photoId };
+                }
+                return { success: false, id: photoId };
+            })
+            .catch(error => {
+                console.error(`Error de red al borrar foto ${photoId}:`, error);
+                return { success: false, id: photoId };
+            })
+        );
+
+        const results = await Promise.all(deletionPromises);
+
+        // Filtrar fotos eliminadas exitosamente de la lista local
+        const successfullyDeletedIds = results
+            .filter(r => r.success)
+            .map(r => r.id);
+            
+        setAlbumPhotos(prevPhotos => 
+            prevPhotos.filter(photo => !successfullyDeletedIds.includes(photo.id))
+        );
+
+        setSelectedPhotoIds([]);
+        toggleDeleteSelectionMode(); 
+        toggleDeletePhotosConfirm();
+    };
+
     const handlePhotoClick = (photo) => {
+        // 1. Modo de SELECCIÓN DE PORTADA
         if (isCoverSelectionMode) {
-            handleSetCover(photo.cover_photo_url);
+            handleSetCover(photo.url);
+        // 2. Modo de SELECCIÓN DE ELIMINACIÓN
+        } else if (isDeleteSelectionMode) {
+            // Alternar la selección de la foto
+            setSelectedPhotoIds(prevIds => {
+                if (prevIds.includes(photo.id)) {
+                    // Deseleccionar
+                    return prevIds.filter(id => id !== photo.id);
+                } else {
+                    // Seleccionar
+                    return [...prevIds, photo.id];
+                }
+            });
+        // 3. Modo NORMAL (Ver foto)
         } else {
             onOpenSettings();
             handleViewPhoto(photo);
         }
+    };
+
+    const toggleDeleteSelectionMode = () => {
+        // Si lo activas, asegúrate de que no haya fotos seleccionadas previamente
+        if (!isDeleteSelectionMode) {
+            setSelectedPhotoIds([]);
+        }
+        setIsDeleteSelectionMode(prev => !prev);
     };
 
     return (
@@ -372,7 +456,10 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                                     albumPhotos.map(photo => (
                                         <div 
                                             key={photo.id} 
-                                            className={`photo-card ${isCoverSelectionMode ? 'cover-select-mode' : ''}`}
+                                            className={`photo-card 
+                                                ${isCoverSelectionMode ? 'cover-select-mode' : ''}
+                                                ${isDeleteSelectionMode && selectedPhotoIds.includes(photo.id) ? 'selected-for-delete' : ''}
+                                            `}
                                             onClick={() => handlePhotoClick(photo)}
                                         >
                                             <img 
@@ -390,7 +477,7 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                     
 
                     <div className="main-buttons">
-                        {!isEditModePhotos && isCoverSelectionMode === false && (
+                        {!isEditModePhotos && !isCoverSelectionMode && !isDeleteSelectionMode && (
                             <>
                                 <button 
                                     onClick={handleOpenSettingsModal} 
@@ -418,7 +505,7 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                             
                         )}
 
-                        {isEditModePhotos && isCoverSelectionMode === false && (
+                        {isEditModePhotos && !isCoverSelectionMode && !isDeleteSelectionMode && (
                             <>
                                 <button 
                                     onClick={() => fileInputRef.current.click()} 
@@ -457,17 +544,52 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                             onCover={handleCoverDetails}
                             onClose={handleCloseDetails}
                             onUpdate={handleUpdateAlbum}
-                            onDelete={handleDeleteAlbum}
+                            onDeleteAlbum={handleDeleteAlbum}
                             onDeletePhoto={handleDeletePhoto}
                             OnShowAllAlbums={showAllAlbums}
                             onAlbumDeleted={handleAlbumDeleted} 
                             onSetCover={toggleCoverSelectionMode}
                             onViewPhoto={selectedPhoto}
                             onFunctionDeletePhoto={deletePhoto} 
+                            onDeletePhotosConfirm={toggleDeletePhotosConfirm}
                         />
                     )}
 
                     {isLoadingPhotos && <LoadingPopup />}
+
+                    {isDeleteSelectionMode && (
+                        <>
+                        <div className='main-buttons'>
+                            <button 
+                                onClick={toggleDeletePhotosConfirm} 
+                                className="addAlbum-button"
+                                disabled={selectedPhotoIds.length === 0}
+                            >
+                                Eliminar ({selectedPhotoIds.length})
+                            </button>
+
+                            <button 
+                                onClick={toggleDeleteSelectionMode} 
+                                className="addAlbum-button modalPhotos-no-button"
+                            >
+                                Cancelar
+                            </button>
+                        </div>
+                        </>
+                    )}
+                    {isDeletePhotosConfirm && (
+                        <>
+                            <div className="modal-backdrop">
+                                <div className="modal-content options-menu-popup">
+                                    <h3>¿Seguro de eliminar?</h3>
+                                    <div className="modal-buttons">
+                                        <button onClick={deleteMultiplePhotos} className="modal-yes-button">Si</button>
+                                        <button onClick={toggleDeletePhotosConfirm} className="modal-no-button">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </>
             )}
         </>

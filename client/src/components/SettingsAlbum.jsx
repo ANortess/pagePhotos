@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import './MainAlbums.css';
 import './OptionsContent.css';
 
-function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate, onDeleteAlbum, onDeletePhoto, OnShowAllAlbums, onAlbumDeleted, onSetCover, onViewPhoto, onFunctionDeletePhoto}){
+function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate, onDeleteAlbum, onDeletePhoto, OnShowAllAlbums, onAlbumDeleted, 
+    onSetCover, onViewPhoto, onFunctionDeletePhoto}){
     const [editTitle, setEditTitle] = useState(album.title);
     const [editDescription, setEditDescription] = useState(album.description || '');
 
@@ -263,7 +264,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
                 </>
             )}
 
-            {mode === '_viewPhoto' && onViewPhoto && (
+            {mode === '_viewPhoto' && (
                 <div>
                     <div className='modal-viewPhoto'>
                         <img 
@@ -293,7 +294,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
     const handleBackdropClick = (event) => {
         if (event.target === event.currentTarget) {
             onClose();
-            onInfo();
+            setShowEditError(false);
         }
     };
 
