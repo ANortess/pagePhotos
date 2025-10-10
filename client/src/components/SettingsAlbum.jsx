@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './MainAlbums.css';
 import './OptionsContent.css';
 
-function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate, onDelete, OnShowAllAlbums, onAlbumDeleted, onSetCover  }){
+function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate, onDeleteAlbum, onDeletePhoto, OnShowAllAlbums, onAlbumDeleted, onSetCover, onViewPhoto, onFunctionDeletePhoto}){
     const [editTitle, setEditTitle] = useState(album.title);
     const [editDescription, setEditDescription] = useState(album.description || '');
 
@@ -13,6 +13,8 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
     const isoDateString = dateString ? String(dateString).replace(' ', 'T') : '';
     const dateObject = new Date(isoDateString);
     const isValidDate = !isNaN(dateObject.getTime()); // Uso .getTime() para una comprobación más robusta
+    
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
 
     const formattedDate = isValidDate 
         ? dateObject.toLocaleDateString('es-ES', { 
@@ -37,11 +39,14 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
         case "_edit":
             modalTitle = "Editando álbum";
             break;
-        case "_delete":
+        case "_deleteAlbum":
             modalTitle = album.title;
             break;
         case "_cover":
-            modalTitle = "Cambiar portada"
+            modalTitle = "Tú Portada";
+            break;
+        case "_viewPhoto":
+            modalTitle = "";
             break;
         default:
             modalTitle = album.title;
@@ -62,7 +67,6 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
         }
 
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app'; // Define tu URL base
             const response = await fetch(`${API_BASE_URL}/albums/${album.id}`, {
                 method: 'PATCH',
                 headers: {
@@ -98,13 +102,20 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
         const token = localStorage.getItem('authToken');
         const albumIdToDelete = album.id;
 
+        const photosCount = await getPhotosCount(albumIdToDelete, token); 
+
         if (!token) {
             alert("No hay token para autenticar la eliminación.");
             return;
         }
 
+        if (photosCount > 0) {
+            // Si hay fotos, llama a la función de advertencia (que ya tienes)
+            emptyAlbumMessage(photosCount); 
+            return; // Detiene la ejecución para no borrar el álbum
+        }
+
         try {
-            const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pagephotos-production-up.railway.app' /*'http://localhost:3001'*/;
             const response = await fetch(`${API_BASE_URL}/albums/${albumIdToDelete}`, {
                 method: 'DELETE',
                 headers: {
@@ -128,11 +139,43 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
         }
     };
 
+    const getPhotosCount = async (albumId, token) => {
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/albums/${albumId}/photos`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`, 
+                },
+            });
+            
+            if (!response.ok) {
+                console.error("No se pudieron cargar las fotos para la comprobación.");
+                return -1; // Retorna un valor que indique error, para detener la eliminación
+            }
+            
+            const photos = await response.json();
+            return photos.length;
+
+        } catch (error) {
+            console.error("Error de red al contar fotos:", error);
+            return -1; 
+        }
+    };
+
+    const handleDeletePhotoClick = () => {
+        if (onViewPhoto && onViewPhoto.id) {
+            onFunctionDeletePhoto(onViewPhoto.id, album.id);
+            onClose();
+        } else {
+            alert("No se encontró el ID de la foto para eliminar.");
+        }
+    }
+
     const handleSetCover = () => {
         onClose();
         onSetCover();
     }
-    // 3. Renderizado del contenido basado en el modo
+    
     const content = (
         <>
             {mode === '_edit' && (
@@ -163,10 +206,7 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
                             rows="3"
                         />
                     </div>
-                    {/* Puedes añadir más campos de edición aquí */}
-                    <div className="modal-buttons">
-                        <button onClick={onCover} className="modal-yes-button">Cambiar portada</button>
-                    </div>
+
                     <div className="modal-buttons">
                         <button onClick={handleSaveEdit} className="modal-yes-button">Guardar</button>
                         <button onClick={onInfo} className="modal-no-button">Volver</button>
@@ -180,7 +220,8 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
 
                     <div className="modal-buttons">
                         <button onClick={onEdit} className="modal-yes-button">Editar</button>
-                        <button onClick={onDelete} className="modal-yes-button">Eliminar</button>
+                        <button onClick={onCover} className="modal-yes-button">Portada</button>
+                        <button onClick={onDeleteAlbum} className="modal-yes-button">Eliminar</button>
                     </div>
                     <div className="modal-buttons">
                         <button onClick={onClose} className="modal-no-button">Volver</button>
@@ -191,20 +232,22 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
 
             {mode == '_cover' && (
                 <>
-                    <p>¿Qué portada quieres poner?</p>
+                    <div className='modal-cover-show'>
+                        <img 
+                            src={album.cover_photo_url} 
+                            alt="Portada" 
+                        />
+                    </div>
 
                     <div className="modal-buttons">
-                        <button onClick={handleSetCover} className="modal-yes-button">Elegir</button>
-                    </div>
-                    <div className="modal-buttons">
-                        <button  className="modal-yes-button">Guardar</button>
-                        <button onClick={onEdit} className="modal-no-button">Volver</button>
+                        <button onClick={handleSetCover} className="modal-yes-button">Cambiar</button>
+                        <button onClick={onInfo} className="modal-no-button">Volver</button>
                     </div>
                 </>
             )}
 
             
-            {mode === '_delete' && (
+            {mode === '_deleteAlbum' && (
                 <>
                     <p>Desde el {formattedDate}</p>
                     <p>¿Quieres realmente eliminar este álbum?</p>
@@ -219,12 +262,44 @@ function SettingsAlbum({ album, mode, onInfo, onEdit, onCover, onClose, onUpdate
                     </div>
                 </>
             )}
+
+            {mode === '_viewPhoto' && onViewPhoto && (
+                <div>
+                    <div className='modal-viewPhoto'>
+                        <img 
+                            src={onViewPhoto.url} 
+                            alt={`ViewPhoto ${onViewPhoto.id || ''}`} 
+                        />
+                    </div>
+                    <div className="modal-buttons">
+                        <button onClick={onDeletePhoto} className="modal-yes-button">Eliminar</button>
+                        <button onClick={onClose} className="modal-no-button">Volver</button>
+                    </div>
+                </div>
+            )}
+
+            {mode === '_deletePhoto' && (
+                <div>
+                    <p>¿Quieres realmente eliminar esta foto?</p>
+                    <div className="modal-buttons">
+                        <button onClick={handleDeletePhotoClick} className="modal-yes-button">Eliminar</button>
+                        <button onClick={onClose} className="modal-no-button">Volver</button>
+                    </div>
+                </div>
+            )}
         </>
     );
-    
+
+    const handleBackdropClick = (event) => {
+        if (event.target === event.currentTarget) {
+            onClose();
+            onInfo();
+        }
+    };
+
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content">
+        <div className="modal-backdrop" onClick={handleBackdropClick}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h3>{modalTitle}</h3> {/* <-- Título dinámico */}
                 {content} {/* <-- Contenido dinámico */}
             </div>

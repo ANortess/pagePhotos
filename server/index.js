@@ -402,6 +402,51 @@ app.get('/albums/:albumId/photos', verifyToken, async (req, res) => {
     }
 });
 
+app.delete('/albums/:albumId/photos/:photoId', verifyToken, async (req, res) => {
+    // 1. Obtener IDs de la URL y del token
+    const { albumId, photoId } = req.params;
+    const userId = req.userId; // Obtenido del middleware verifyToken
+
+    try {
+        // 2. Obtener el public_id de Cloudinary ANTES de la eliminación
+        // Esto es crucial para poder borrar la imagen del servicio externo.
+        const [photoRows] = await pool.execute(
+            'SELECT public_id FROM photos WHERE id = ? AND album_id = ? AND user_id = ?',
+            [photoId, albumId, userId]
+        );
+        
+        const photoToDelete = photoRows[0];
+
+        if (!photoToDelete) {
+            // La foto no existe, no está en ese álbum, o no pertenece al usuario
+            return res.status(404).json({ message: 'Foto no encontrada o no autorizada.' });
+        }
+
+        const cloudinaryPublicId = photoToDelete.public_id;
+
+        // 3. Eliminar la foto de Cloudinary
+        // Esto es asíncrono y debe completarse antes de seguir
+        await cloudinary.uploader.destroy(cloudinaryPublicId);
+        console.log(`Cloudinary public_id ${cloudinaryPublicId} eliminado.`);
+
+        // 4. Eliminar el registro de la base de datos
+        // Ya comprobamos la existencia y autorización, pero lo eliminamos de la tabla
+        const [deleteResult] = await pool.execute(
+            'DELETE FROM photos WHERE id = ? AND album_id = ? AND user_id = ?',
+            [photoId, albumId, userId]
+        );
+        
+        // 5. Devolver la respuesta exitosa (204 No Content es ideal para DELETE)
+        // No es necesario verificar affectedRows nuevamente porque ya lo hicimos arriba.
+        res.status(204).send(); 
+
+    } catch (error) {
+        console.error('Error al eliminar foto:', error);
+        // Devolvemos 500 para errores de DB o Cloudinary
+        res.status(500).json({ message: 'Error interno del servidor al eliminar la foto.' });
+    }
+});
+
 // Ruta de prueba
 app.get('/', (req, res) => {
     res.send('Server is ready for authentication!');

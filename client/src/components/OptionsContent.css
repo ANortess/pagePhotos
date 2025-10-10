@@ -37,15 +37,15 @@
     border: none;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
-    max-width: 400px;
-    width: 90%;
+    max-height: 90vh;
+    max-width: 90vw;
     color: rgb(208, 111, 111);
     font-size: 20px;
 }
 
 .modal-content h3 {
     margin-top: 0;
-    margin-bottom: 25px;
+    margin-bottom: 0;
     font-size: 30px;
 }
 
@@ -107,6 +107,7 @@
 }
 
 .addAlbum-form {
+    margin-top: 20px;
     display: flex;
     flex-wrap: wrap; /* Permite que los elementos pasen a la línea siguiente */
     align-items: center;
@@ -168,9 +169,42 @@
     margin-bottom: 10px;
 }
 
+.modal-cover-show {
+    width: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 12px auto 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.modal-cover-show img {
+    object-fit: contain;
+    max-height: 70vh;
+    width: 100%;
+    object-position: center center;
+}
+
+.modal-viewPhoto {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto; 
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.modal-viewPhoto img {
+    object-fit: contain;
+    max-height: 70vh;
+    object-position: center center;
+}
+
 @media (max-width: 600px) {
     .modal-content h3 {
-        font-size: 22px;
+        font-size: 28px;
     }
 
     .albumTitle {
