@@ -263,9 +263,6 @@
     .photo-card {
         height: 100px;
     }
-
-    .mobile-menu-icon {
-    }
 }
 
 @media (min-width: 601px) {
