@@ -47,6 +47,11 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     const [isDeleteSelectionMode, setIsDeleteSelectionMode] = useState(false);
     const [isDeletePhotosConfirm, setIsDeletePhotosConfirm] = useState(false);
 
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(prev => !prev);
+    };
     
     const toggleCoverSelectionMode = () => {
         // Al hacer clic en el botón "Cambiar Portada"
@@ -79,6 +84,8 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
     const handleAlbumClick = (album) => {
         setSelectedAlbum(album);
         fetchPhotos(album.id);
+        isMobileMenuOpen(false);
+        setIsEditModePhotos(false);
     };
 
     useEffect(() => {
@@ -381,7 +388,35 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                 <>
                     <div className="name-of-page">
                         <span>Álbums</span>
+
+                        <button 
+                            className={`mobile-menu-icon ${isMobileMenuOpen ||isEditModePhotos ? 'mobile-menu-icon-hidden':''}`}
+                            onClick={toggleMobileMenu}
+                        >
+                            ☰ 
+                        </button>
                     </div>
+
+                    {isMobileMenuOpen && (
+                        <div className="menu-overlay" 
+                            onClick={toggleMobileMenu}
+                            >    
+                        </div>
+                    )}
+                    <div 
+                        className= {`menu-background ${isMobileMenuOpen ? 'menu-open' : ''}`}
+                        onClick={(e) => e.stopPropagation()} 
+                    >
+                        <button onClick={ () => {
+                            onOpenAddAlbum();
+                            toggleMobileMenu();
+                        }} className="menu-button">Añadir</button>
+                        <button onClick={ () => {
+                            toggleOptionsMenu();
+                            toggleMobileMenu();
+                        }} className="menu-button">Cerrar</button>
+                    </div>
+
                     <div className="gallery-content">
                         <div className="albums-grid"> 
                             {/* 🔥 Mapeamos la lista para crear una tarjeta por cada álbum */}
@@ -436,7 +471,14 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                 <>
                     <div className="name-of-page">
                         <span>Fotos</span>
+                        <button 
+                            className={`mobile-menu-icon ${isMobileMenuOpen ||isEditModePhotos ? 'mobile-menu-icon-hidden':''}`}
+                            onClick={toggleMobileMenu}
+                        >
+                            ☰ 
+                        </button>
                     </div>
+
                     <div className="gallery-content">
                         <input
                             type="file"
@@ -590,6 +632,56 @@ function MainAlbums({ albums, setAlbums, isAddModalOpen, handleSaveNewAlbum, han
                             </div>
                         </>
                     )}
+
+                    {isMobileMenuOpen && (
+                        <div className="menu-overlay" 
+                            onClick={toggleMobileMenu}
+                            >    
+                        </div>
+                    )}
+                    <div 
+                        className= {`menu-background ${isMobileMenuOpen ? 'menu-open' : ''}`}
+                        onClick={(e) => e.stopPropagation()} 
+                    >
+                        <button onClick={ () => {
+                            showAllAlbums();
+                            toggleMobileMenu();
+                        }} className="menu-button">Álbums</button>
+                        <button onClick={ () => {
+                            onOpenSettings();
+                            handleInfoDetails();
+                            toggleMobileMenu();
+                        }} className="menu-button">Detalles</button>
+                        <button onClick={ () => {
+                            fileInputRef.current.click();
+                            toggleMobileMenu();
+                        }} className="menu-button">Añadir</button>
+                        <button onClick={ () => {
+                            setIsEditModePhotos(true);
+                            toggleDeleteSelectionMode();
+                            toggleMobileMenu();
+                        }} className="menu-button">Eliminar</button>
+                    </div>
+
+                    <div className={`menu-button-delete ${isEditModePhotos ? 'menu-delete-open' : ''}`}>
+                        <button 
+                            onClick={toggleDeletePhotosConfirm} 
+                            className="menu-button-delete-confirm"
+                            disabled={selectedPhotoIds.length === 0}
+                        >
+                            Eliminar ({selectedPhotoIds.length})
+                        </button>
+                        <button 
+                            onClick={ () => {
+                                setIsEditModePhotos(false);
+                                toggleDeleteSelectionMode();
+                            }} 
+                            className="menu-button-delete-confirm"
+                        >
+                            Cancelar
+                        </button>
+                        <button className="menu-button-delete-confirm hidden-but-retains-space">none</button>
+                    </div>
                 </>
             )}
         </>
@@ -617,12 +709,16 @@ function AddAlbumModal({ onSave, onCancel }) {
             }, 3000); 
         }
     };
-
+    const handleContentClick = (e) => {
+        // 🛑 CRUCIAL: Detiene la propagación del evento clic.
+        // Esto evita que al hacer clic dentro del modal-content se active el onCancel del backdrop.
+        e.stopPropagation();
+    };
    
 
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content">
+        <div className="modal-backdrop" onClick={onCancel}>
+            <div className="modal-content" onClick={handleContentClick}>
                 <h3>Añadir Nuevo Álbum</h3>
                 
                 {/* Campo de Título */}
@@ -663,9 +759,13 @@ function AddAlbumModal({ onSave, onCancel }) {
 }
 
 function OptionsMenuPopup({ onClose, toggleOptionsMenu }) {
+    const handleContentClick = (e) => {
+        // 🛑 CRUCIAL: Detiene la propagación del evento clic.
+        e.stopPropagation();
+    };
     return (
-        <div className="modal-backdrop">
-            <div className="modal-content options-menu-popup">
+        <div className="modal-backdrop" onClick={onClose}>
+            <div className="modal-content options-menu-popup" onClick={handleContentClick}>
                 <h3>¿Quieres cerrar sesión?</h3>
                 <div className="modal-buttons">
                     <button onClick={onClose} className="modal-yes-button">Si</button>

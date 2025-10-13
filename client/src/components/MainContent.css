@@ -109,11 +109,11 @@
     }
 
     .gallery-content {
-        margin-top: 5px;
+        margin-top: 0;
         margin-bottom: 10px;
     }
 
     .main-buttons {
-        margin-bottom: 5px;
+        display: none;
     }
 }

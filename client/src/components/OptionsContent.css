@@ -38,7 +38,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     max-height: 90vh;
-    max-width: 90vw;
+    max-width: 75%;
     color: rgb(208, 111, 111);
     font-size: 20px;
 }
